@@ -538,6 +538,41 @@ def get_all_beneficiaires():
     }), 200
 
 
+###############################################
+#######  Get  BENEF by ID  ##################
+@main.route('/benef/<int:id>', methods=['GET'])
+def get_beneficiaire_by_id(id):
+    # Récupérer le bénéficiaire par son ID
+    beneficiaire = Beneficiaire.query.get(id)
+    
+    # Vérifier si le bénéficiaire existe
+    if not beneficiaire:
+        return jsonify({"message": "Bénéficiaire non trouvé"}), 404
+    
+    # Récupérer le fournisseur associé
+    fournisseur = Fournisseur.query.get(beneficiaire.fournisseur_id)
+    
+    # Préparer la réponse avec les détails du fournisseur
+    result = {
+        "id": beneficiaire.id,
+        "nom": beneficiaire.nom,
+        "commission_USDT": beneficiaire.commission_USDT,
+        "fournisseur": {
+            "id": fournisseur.id if fournisseur else None,
+            "nom": fournisseur.nom if fournisseur else "Inconnu",
+            "taux_jour": fournisseur.taux_jour if fournisseur else None,
+            "quantite_USDT": float(fournisseur.quantite_USDT) if fournisseur else None
+        }
+    }
+    
+    return jsonify({
+        "message": "Bénéficiaire récupéré avec succès",
+        "beneficiaire": result
+    }), 200
+
+
+
+
 ##############################################
 #######  Modifier BENEF ##################
 @main.route('/update/benef/<int:id>', methods=['PUT'])
@@ -594,3 +629,11 @@ def delete_beneficiaire(id):
     db.session.delete(beneficiaire)
     db.session.commit()
     return jsonify({"message": "Bénéficiaire supprimé avec succès"}), 200
+
+
+
+
+
+
+
+    
