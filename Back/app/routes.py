@@ -640,16 +640,6 @@ def delete_beneficiaire(id):
 
 
 
-
-
-
-
-
-
-
-
-    
-
     
 ##########################################################################################
 ##########################################################################################    
@@ -674,15 +664,12 @@ def get_total_fournisseurs():
     return jsonify({"total_fournisseurs": total_fournisseurs}), 200
 
 
-
-
 #######################################################
 #######  Get all transa NUMBER TOTAL ##################
 @main.route('/total/tr', methods=['GET'])
 def get_total_transactions():
     total_transactions = Transaction.query.count()  # Compter le nombre total de transactions
     return jsonify({"total": total_transactions}), 200
-
 
     
 #######################################################
@@ -691,3 +678,103 @@ def get_total_transactions():
 def get_total_beneficiaires():
     total_beneficiaires = Beneficiaire.query.count()
     return jsonify({"total_beneficiaires": total_beneficiaires}), 200
+
+
+
+
+
+
+
+
+    
+##########################################################################################
+##########################################################################################    
+##########################################################################################
+##########################################################################################    
+##########################################################################################
+##########################################################################################    
+##########################################################################################
+##########################################################################################    
+##########################################################################################
+##########################################################################################    
+##########################################################################################
+##########################################################################################
+############## CALCUL ################## CALCUL ##################
+############## CALCUL ################## CALCUL ##################
+@main.route('/calculer', methods=['POST'])
+def calculer():
+    data = request.json
+    montantFCFA = data.get('montantFCFA', 0)
+    tauxConvenu = data.get('tauxConvenu', 0)
+    tauxFournisseur = data.get('tauxFournisseur', 0)
+    quantiteUSDT = data.get('quantiteUSDT', 0)
+    commission = data.get('commission', 0)
+
+    if tauxConvenu == 0:
+        return jsonify({"error": "Le taux convenu ne peut pas être zéro"}), 400
+
+    montantUSDT = montantFCFA / tauxConvenu
+    beneficeParUSDT = tauxConvenu - tauxFournisseur
+    beneficeTotalFCFA = beneficeParUSDT * quantiteUSDT
+    beneficeBeneficiaire = commission * quantiteUSDT
+
+    resultats = {
+        "montantUSDT": round(montantUSDT, 2),
+        "beneficeUSDT": round(beneficeParUSDT, 2),
+        "beneficeTotalFCFA": round(beneficeTotalFCFA, 2),
+        "beneficeBeneficiaire": round(beneficeBeneficiaire, 2),
+        "totalBenefice": round(beneficeTotalFCFA, 2),
+        "beneficeParBeneficiaire": round(beneficeBeneficiaire, 2)
+    }
+    
+    return jsonify(resultats)
+
+############## CALCUL GET ALL  ##########
+@main.route('/cal', methods=['GET'])
+def getalltransactions():
+    transactions = Transaction.query.all()
+    results = [
+        {
+            "id": t.id,
+            "montantFCFA": t.montantFCFA,
+            "tauxConvenu": t.tauxConvenu,
+            "tauxFournisseur": t.tauxFournisseur,
+            "quantiteUSDT": t.quantiteUSDT,
+            "commission": t.commission
+        }
+        for t in transactions
+    ]
+    return jsonify(results)
+
+############## CALCUL LES 3 DERNIERS ############    
+#@main.route('/transactions/last3', methods=['GET'])
+#def get_last_three_transactions():
+#    transactions = Transaction.query.order_by(Transaction.id.desc()).limit(3).all()
+    # results = [
+        # {
+            # "id": t.id,
+            # "montantFCFA": t.montantFCFA,
+    #         "tauxConvenu": t.tauxConvenu,
+    #         "tauxFournisseur": t.tauxFournisseur,
+    #         "quantiteUSDT": t.quantiteUSDT,
+    #         "commission": t.commission
+    #     }
+    #     for t in transactions
+    # ]
+    # return jsonify(results)
+
+
+##########################################################################################
+##########################################################################################    
+##########################################################################################
+##########################################################################################    
+##########################################################################################
+##########################################################################################    
+##########################################################################################
+##########################################################################################    
+##########################################################################################
+##########################################################################################    
+##########################################################################################
+##########################################################################################
+############## HISTORIQUE ################## HISTORIQUE ##################
+############## HISTORIQUE ################## HISTORIQUE ##################
