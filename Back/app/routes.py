@@ -736,9 +736,9 @@ def getalltransactions():
     results = [
         {
             "id": t.id,
-            "montantFCFA": t.montantFCFA,
-            "tauxConvenu": t.tauxConvenu,
-            "tauxFournisseur": t.tauxFournisseur,
+            "montantFCFA": t.montant_FCFA,
+            "tauxConvenu": t.taux_convenu,
+            "tauxFournisseur": t.taux_jour,
             "quantiteUSDT": t.quantiteUSDT,
             "commission": t.commission
         }
